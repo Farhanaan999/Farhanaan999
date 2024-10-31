@@ -1,0 +1,150 @@
+import React, { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { CheckCircle2, XCircle } from 'lucide-react';
+
+const MathQuizGame = () => {
+  const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [score, setScore] = useState(0);
+  const [showResult, setShowResult] = useState(false);
+  const [answered, setAnswered] = useState(false);
+  const [selectedAnswer, setSelectedAnswer] = useState(null);
+
+  const questions = [
+    {
+      id: 1,
+      question: "Himpunan penyelesaian pertidaksamaan y ≤ 3 dapat digambarkan dengan daerah yang diarsir pada gambar:",
+      choices: ["A", "B", "C", "D", "E"],
+      correctAnswer: "A",
+      explanation: "Pertidaksamaan y ≤ 3 menunjukkan semua titik yang berada di bawah atau pada garis y = 3"
+    },
+    {
+      id: 2,
+      question: "Himpunan penyelesaian pertidaksamaan y ≥ 3 dapat digambarkan dengan daerah yang diarsir pada gambar:",
+      choices: ["A", "B", "C", "D", "E"],
+      correctAnswer: "B",
+      explanation: "Pertidaksamaan y ≥ 3 menunjukkan semua titik yang berada di atas atau pada garis y = 3"
+    },
+    {
+      id: 3,
+      question: "Himpunan penyelesaian pertidaksamaan x ≥ 3 dapat digambarkan dengan daerah yang diarsir pada gambar:",
+      choices: ["A", "B", "C", "D", "E"],
+      correctAnswer: "C",
+      explanation: "Pertidaksamaan x ≥ 3 menunjukkan semua titik yang berada di kanan atau pada garis x = 3"
+    },
+    {
+      id: 4,
+      question: "Daerah yang diarsir pada gambar di soal nomor 4 dapat dinyatakan dengan:",
+      choices: ["2 ≤ x ≤ 4", "2 ≤ y ≤ 4", "x ≥ 2 atau x ≤ 4", "y ≥ 2 atau y ≤ 4", "x ≥ 2 atau y ≤ 4"],
+      correctAnswer: "A",
+      explanation: "Daerah yang diarsir menunjukkan interval pada sumbu x dari 2 hingga 4"
+    }
+  ];
+
+  const handleAnswer = (choice) => {
+    setSelectedAnswer(choice);
+    setAnswered(true);
+    if (choice === questions[currentQuestion].correctAnswer) {
+      setScore(score + 1);
+    }
+  };
+
+  const handleNext = () => {
+    if (currentQuestion < questions.length - 1) {
+      setCurrentQuestion(currentQuestion + 1);
+      setAnswered(false);
+      setSelectedAnswer(null);
+    } else {
+      setShowResult(true);
+    }
+  };
+
+  const handleRestart = () => {
+    setCurrentQuestion(0);
+    setScore(0);
+    setShowResult(false);
+    setAnswered(false);
+    setSelectedAnswer(null);
+  };
+
+  return (
+    <Card className="w-full max-w-2xl mx-auto">
+      <CardHeader>
+        <CardTitle className="text-2xl text-center">
+          Kuis Pertidaksamaan Linear
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        {!showResult ? (
+          <div className="space-y-4">
+            <div className="text-sm text-gray-500 text-right">
+              Skor: {score}/{questions.length}
+            </div>
+            <div className="text-lg font-medium mb-4">
+              {questions[currentQuestion].question}
+            </div>
+            <div className="grid grid-cols-1 gap-2">
+              {questions[currentQuestion].choices.map((choice) => (
+                <Button
+                  key={choice}
+                  onClick={() => !answered && handleAnswer(choice)}
+                  variant={
+                    answered
+                      ? choice === questions[currentQuestion].correctAnswer
+                        ? "success"
+                        : choice === selectedAnswer
+                        ? "destructive"
+                        : "outline"
+                      : "outline"
+                  }
+                  className={`p-4 ${
+                    answered && "cursor-default"
+                  }`}
+                  disabled={answered}
+                >
+                  {choice}
+                  {answered &&
+                    choice === questions[currentQuestion].correctAnswer && (
+                      <CheckCircle2 className="ml-2 h-4 w-4" />
+                    )}
+                  {answered &&
+                    choice === selectedAnswer &&
+                    choice !== questions[currentQuestion].correctAnswer && (
+                      <XCircle className="ml-2 h-4 w-4" />
+                    )}
+                </Button>
+              ))}
+            </div>
+            {answered && (
+              <div className="mt-4">
+                <p className="text-gray-600 mb-4">
+                  {questions[currentQuestion].explanation}
+                </p>
+                <Button onClick={handleNext} className="w-full">
+                  {currentQuestion === questions.length - 1
+                    ? "Lihat Hasil"
+                    : "Soal Berikutnya"}
+                </Button>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="text-center space-y-4">
+            <h3 className="text-xl font-bold">Hasil Akhir</h3>
+            <p className="text-lg">
+              Skor Anda: {score} dari {questions.length}
+            </p>
+            <p className="text-gray-600">
+              Persentase: {((score / questions.length) * 100).toFixed(1)}%
+            </p>
+            <Button onClick={handleRestart} className="w-full">
+              Mulai Ulang Kuis
+            </Button>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+};
+
+export default MathQuizGame;
